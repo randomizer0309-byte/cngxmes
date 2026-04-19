@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>French Fries</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Comic Sans MS","Comic Sans",cursive;
+    }
+
+    :root{
+      --bg1:#fff1bf;
+      --bg2:#ffd36e;
+      --bg3:#ffab3d;
+      --bg4:#d97721;
+
+      --main:#ffb43f;
+      --main2:#ffc85e;
+      --soft:#ffe18e;
+      --light:#fff8ec;
+      --deep:#a45518;
+      --deep2:#7e3d12;
+      --brown:#5f2b10;
+      --brown2:#7a3914;
+
+      --glass:rgba(255,247,232,0.36);
+      --glass-strong:rgba(255,245,225,0.54);
+
+      --border:rgba(169,74,22,0.18);
+      --hover-outline:rgba(255,255,255,0.97);
+
+      --shadow:0 14px 28px rgba(95,45,10,0.16);
+      --white-glow:
+        0 0 6px rgba(255,255,255,0.50),
+        0 0 12px rgba(255,240,210,0.25),
+        0 0 18px rgba(255,196,118,0.10);
+    }
+
+    html,body{
+      width:100%;
+      min-height:100%;
+      scroll-behavior:smooth;
+    }
+
+    body{
+      min-height:100vh;
+      color:var(--brown);
+      overflow-x:hidden;
+      overflow-y:auto;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(255,255,255,0.18), transparent 22%),
+        radial-gradient(circle at 85% 18%, rgba(255,224,145,0.16), transparent 25%),
+        radial-gradient(circle at 52% 82%, rgba(255,244,215,0.12), transparent 28%),
+        linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3),var(--bg4));
+      position:relative;
+    }
+
+    ::-webkit-scrollbar{
+      width:14px;
+    }
+
+    ::-webkit-scrollbar-track{
+      background:linear-gradient(180deg, rgba(255,244,210,0.75), rgba(233,122,47,0.32));
+      border-left:1px solid rgba(169,74,22,0.12);
+    }
+
+    ::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg,#ffe08b,#ffb43f);
+      border-radius:999px;
+      border:3px solid rgba(255,245,226,0.75);
+      box-shadow:inset 0 0 5px rgba(255,255,255,0.22);
+    }
+
+    ::-webkit-scrollbar-thumb:hover{
+      background:linear-gradient(180deg,#fff0af,#ffbf50);
+    }
+
+    canvas{
+      position:fixed;
+      inset:0;
+      z-index:-2;
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      pointer-events:none;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(90,35,8,0.08)),
+        radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 55%);
+    }
+
+    .topbar{
+      width:100%;
+      padding:16px 18px;
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      align-items:center;
+      gap:14px;
+      position:relative;
+      z-index:100;
+    }
+
+    .leftTop,.centerTop,.rightTop{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .centerTop{
+      justify-content:center;
+    }
+
+    .rightTop{
+      justify-content:flex-end;
+    }
+
+    .menuWrap{
+      position:relative;
+      display:inline-block;
+    }
+
+    .menuShell{
+      position:relative;
+      min-width:172px;
+      border-radius:24px;
+      border:2px solid rgba(255,221,144,0.42);
+      background:linear-gradient(180deg, rgba(255,249,237,0.94), rgba(255,225,177,0.84));
+      box-shadow:
+        0 10px 18px rgba(95,45,10,0.12),
+        inset 0 2px 0 rgba(255,255,255,0.32);
+      backdrop-filter:blur(10px);
+      z-index:200;
+      transition:border-color .06s linear, transform .06s linear;
+      height:46px;
+      overflow:visible;
+    }
+
+    .menuShell:hover,
+    .menuShell.open{
+      transform:translateY(-1px);
+      border-color:rgba(255,255,255,0.86);
+    }
+
+    .menuButton{
+      width:100%;
+      height:46px;
+      padding:0 42px 0 16px;
+      border:none;
+      background:linear-gradient(180deg, #ffd56e, #f0a63d);
+      color:#fffdf8;
+      font-size:17px;
+      font-weight:800;
+      cursor:pointer;
+      text-align:left;
+      text-shadow:var(--white-glow), 0 2px 0 rgba(132,67,20,0.22);
+      position:relative;
+      z-index:2;
+      border-radius:24px;
+    }
+
+    .menuButton::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,190,110,0.02));
+      pointer-events:none;
+      border-radius:24px;
+    }
+
+    .menuArrow{
+      position:absolute;
+      right:15px;
+      top:15px;
+      font-size:13px;
+      color:#fffaf2;
+      text-shadow:var(--white-glow);
+      pointer-events:none;
+      transition:transform .12s ease;
+      z-index:3;
+    }
+
+    .menuShell.open .menuArrow{
+      transform:rotate(180deg);
+    }
+
+    .menuDropdown{
+      position:absolute;
+      top:54px;
+      left:0;
+      width:100%;
+      min-width:172px;
+      opacity:0;
+      transform:translateY(-10px) scaleY(0.96);
+      transform-origin:top;
+      pointer-events:none;
+      transition:opacity .14s ease, transform .14s ease;
+      z-index:250;
+    }
+
+    .menuShell.open .menuDropdown{
+      opacity:1;
+      transform:translateY(0) scaleY(1);
+      pointer-events:auto;
+    }
+
+    .menuDropdownInner{
+      padding:6px 8px 8px;
+      border-radius:20px;
+      border:2px solid rgba(255,221,144,0.36);
+      background:linear-gradient(180deg, rgba(255,246,227,0.98), rgba(255,225,181,0.97));
+      box-shadow:
+        0 16px 30px rgba(95,45,10,0.18),
+        inset 0 2px 0 rgba(255,255,255,0.22);
+      backdrop-filter:blur(10px);
+    }
+
+    .menuOption{
+      width:100%;
+      text-align:left;
+      border:none;
+      background:transparent;
+      color:var(--brown2);
+      padding:11px 13px;
+      border-radius:16px;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      transition:background-color .06s linear, color .06s linear, transform .06s linear;
+      display:block;
+      margin-top:4px;
+    }
+
+    .menuOption:hover{
+      background:rgba(255,255,255,0.18);
+      color:var(--deep);
+      transform:translateX(2px);
+      outline:none;
+    }
+
+    .ringHover{
+      position:relative;
+      isolation:isolate;
+    }
+
+    .ringHover::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:inherit;
+      border:2px solid rgba(255,255,255,0);
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .06s linear, border-color .06s linear;
+      z-index:3;
+    }
+
+    .ringHover:hover::after{
+      opacity:1;
+      border-color:rgba(255,255,255,0.93);
+    }
+
+    .smallBox{
+      min-height:40px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:0 12px;
+      border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,250,241,0.88), rgba(255,233,195,0.79));
+      border:2px solid rgba(255,221,144,0.34);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+      font-size:12px;
+      transition:border-color .06s linear, transform .06s linear;
+    }
+
+    .smallBox:hover{
+      transform:translateY(-1px);
+      border-color:var(--hover-outline);
+    }
+
+    .smallBox .label{
+      color:#a34f1c;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.35px;
+    }
+
+    .smallBox .value{
+      color:var(--deep);
+      font-weight:800;
+      text-shadow:0 0 4px rgba(255,205,130,0.12);
+    }
+
+    .main{
+      min-height:calc(100vh - 80px);
+      overflow:visible;
+      padding:14px 18px 42px;
+      position:relative;
+      z-index:10;
+    }
+
+    .hero{
+      width:min(960px, 100%);
+      margin:0 auto;
+      text-align:center;
+    }
+
+    .hero h1{
+      font-size:68px;
+      line-height:1;
+      color:#fffdf8;
+      margin-top:8px;
+      margin-bottom:10px;
+      text-shadow:
+        var(--white-glow),
+        0 4px 0 var(--deep2),
+        0 8px 16px rgba(100,45,10,0.15);
+    }
+
+    .rotatingLine{
+      min-height:34px;
+      font-size:22px;
+      color:var(--brown);
+      margin-bottom:20px;
+      transition:opacity .18s linear, transform .18s linear;
+      text-shadow:0 1px 0 rgba(255,255,255,0.18);
+    }
+
+    .rotatingLine.fade{
+      opacity:0;
+      transform:translateY(4px);
+    }
+
+    .stats{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:22px;
+    }
+
+    .statCard{
+      width:190px;
+      min-height:68px;
+      border-radius:18px;
+      padding:10px 13px;
+      background:linear-gradient(180deg, rgba(255,251,240,0.40), rgba(255,229,181,0.44));
+      border:2px solid rgba(255,221,144,0.26);
+      box-shadow:
+        0 8px 16px rgba(95,45,10,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.24);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      backdrop-filter:blur(6px);
+      transition:border-color .06s linear, transform .06s linear;
+    }
+
+    .statCard:hover{
+      transform:translateY(-1px);
+      border-color:var(--hover-outline);
+    }
+
+    .statNum{
+      font-size:30px;
+      font-weight:800;
+      line-height:1;
+      color:#fffdf9;
+      text-shadow:
+        var(--white-glow),
+        0 3px 0 var(--deep2);
+    }
+
+    .statLabel{
+      font-size:11px;
+      line-height:1.15;
+      text-align:left;
+      text-transform:uppercase;
+      letter-spacing:1.6px;
+      color:#8b4c1c;
+      font-weight:800;
+    }
+
+    .mainNav{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:18px;
+      margin-bottom:26px;
+    }
+
+    .navBtn{
+      min-width:138px;
+      padding:12px 18px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      background:linear-gradient(180deg, #ffd56e, #f0a63d);
+      color:#fffdf8;
+      font-size:18px;
+      font-weight:800;
+      box-shadow:
+        0 6px 0 var(--deep2),
+        0 12px 18px rgba(95,45,10,0.14);
+      text-shadow:
+        var(--white-glow),
+        0 2px 0 rgba(120,60,10,0.18);
+      transition:transform .07s linear, filter .07s linear, border-color .07s linear;
+    }
+
+    .navBtn:hover{
+      transform:translateY(-2px) scale(1.02);
+      filter:brightness(1.04);
+    }
+
+    .stackBoxes{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      margin-top:6px;
+    }
+
+    .infoBox{
+      text-align:left;
+      padding:18px 18px 16px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(255,251,243,0.37), rgba(255,231,188,0.45));
+      border:2px solid rgba(255,221,144,0.24);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(6px);
+      transition:border-color .06s linear, transform .06s linear;
+    }
+
+    .infoBox:hover{
+      transform:translateY(-1px);
+      border-color:var(--hover-outline);
+    }
+
+    .infoHead{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:12px;
+      text-align:center;
+    }
+
+    .infoHead h3{
+      font-size:24px;
+      color:#fffdf8;
+      text-shadow:
+        var(--white-glow),
+        0 3px 0 var(--deep2);
+      margin-bottom:6px;
+    }
+
+    .divider{
+      width:100%;
+      max-width:220px;
+      height:3px;
+      border-radius:999px;
+      background:linear-gradient(90deg, transparent, rgba(255,220,120,0.7), transparent);
+    }
+
+    .infoBox p{
+      color:var(--brown);
+      font-size:16px;
+      line-height:1.5;
+      text-align:left;
+      text-shadow:0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    .bottomButtons{
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:18px;
+      margin-top:26px;
+      padding-bottom:8px;
+    }
+
+    .bottomBtn{
+      min-width:178px;
+      padding:12px 18px;
+      border:none;
+      border-radius:18px;
+      cursor:pointer;
+      background:linear-gradient(180deg, #ffd56e, #f0a63d);
+      color:#fffdf8;
+      font-size:17px;
+      font-weight:800;
+      box-shadow:
+        0 6px 0 var(--deep2),
+        0 12px 18px rgba(95,45,10,0.14);
+      text-shadow:
+        var(--white-glow),
+        0 2px 0 rgba(120,60,10,0.18);
+      transition:transform .07s linear, filter .07s linear;
+    }
+
+    .bottomBtn:hover{
+      transform:translateY(-2px) scale(1.02);
+      filter:brightness(1.04);
+    }
+
+    @media (max-width: 900px){
+      .topbar{
+        grid-template-columns:1fr;
+      }
+
+      .leftTop,.centerTop,.rightTop{
+        justify-content:center;
+      }
+
+      .hero h1{
+        font-size:50px;
+      }
+
+      .rotatingLine{
+        font-size:18px;
+      }
+    }
+
+    @media (max-width: 600px){
+      .hero h1{
+        font-size:40px;
+      }
+
+      .rotatingLine{
+        font-size:16px;
+        min-height:28px;
+      }
+
+      .statCard{
+        width:100%;
+        max-width:260px;
+      }
+
+      .navBtn,
+      .bottomBtn{
+        width:100%;
+        max-width:220px;
+        min-width:unset;
+      }
+
+      .menuShell{
+        min-width:145px;
+      }
+
+      .menuDropdown{
+        min-width:145px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="overlay"></div>
+
+  <div class="topbar">
+    <div class="leftTop">
+      <div class="menuWrap">
+        <div class="menuShell ringHover" id="menuShell">
+          <button class="menuButton" id="menuButton" type="button">Home</button>
+          <span class="menuArrow">▼</span>
+
+          <div class="menuDropdown" id="menuDropdown">
+            <div class="menuDropdownInner">
+              <button class="menuOption ringHover" data-link="">🍟 Home</button>
+              <button class="menuOption ringHover" data-link="games.html">🎮 Games</button>
+              <button class="menuOption ringHover" data-link="movies.html">🎬 Movies</button>
+              <button class="menuOption ringHover" data-link="chat.html">💬 Chat</button>
+              <button class="menuOption ringHover" data-link="calculator.html">🧮 Calculator</button>
+              <button class="menuOption ringHover" data-link="translator.html">🌐 Translator</button>
+              <button class="menuOption ringHover" data-link="settings.html">⚙️ Settings</button>
+              <button class="menuOption ringHover" data-link="device.html">📱 Device Info</button>
+              <button class="menuOption ringHover" data-link="liability.html">📄 Liability</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="centerTop">
+      <div class="smallBox ringHover">
+        <span id="clockEmoji">🕙</span>
+        <span class="label">Time</span>
+        <span class="value" id="clock">10:18 AM</span>
+      </div>
+
+      <div class="smallBox ringHover">
+        <span>🔋</span>
+        <span class="label">Battery</span>
+        <span class="value" id="battery">100%</span>
+      </div>
+    </div>
+
+    <div class="rightTop"></div>
+  </div>
+
+  <main class="main">
+    <section class="hero">
+      <h1>French Fries</h1>
+      <div class="rotatingLine" id="rotatingLine">Games, movies, tools, and a whole lot of crispy chaos.</div>
+
+      <div class="stats">
+        <div class="statCard ringHover">
+          <div class="statNum">1000+</div>
+          <div class="statLabel">Games</div>
+        </div>
+
+        <div class="statCard ringHover">
+          <div class="statNum">42</div>
+          <div class="statLabel">Movies</div>
+        </div>
+
+        <div class="statCard ringHover">
+          <div class="statNum" id="visitCount">0</div>
+          <div class="statLabel">Visits</div>
+        </div>
+      </div>
+
+      <div class="mainNav">
+        <button class="navBtn ringHover" onclick="goToPage('games.html')">Games</button>
+        <button class="navBtn ringHover" onclick="goToPage('movies.html')">Movies</button>
+        <button class="navBtn ringHover" onclick="goToPage('liability.html')">Liability</button>
+        <button class="navBtn ringHover" onclick="goToPage('settings.html')">Settings</button>
+      </div>
+
+      <div class="stackBoxes">
+        <div class="infoBox ringHover">
+          <div class="infoHead">
+            <h3>Announcements</h3>
+            <div class="divider"></div>
+          </div>
+          <p>
+            Welcome to French Fries. Browse games, watch stuff, use tools,
+            and pick whatever looks fun. This is your crispy little corner
+            of the internet, so put announcements, featured updates,
+            or anything important right here.
+          </p>
+        </div>
+
+        <div class="infoBox ringHover">
+          <div class="infoHead">
+            <h3>New Stuff</h3>
+            <div class="divider"></div>
+          </div>
+          <p>
+            - Homepage revamped into a full French Fries theme<br>
+            - Buttons changed into golden fry colors<br>
+            - Background now has way more floating fries<br>
+            - Navigation menu now rolls out without moving the page
+          </p>
+        </div>
+      </div>
+
+      <div class="bottomButtons">
+        <button class="bottomBtn ringHover" onclick="window.open('https://forms.gle/Eo7BzqjjeMEEKTa18','_blank')">Request a Game</button>
+        <button class="bottomBtn ringHover" onclick="window.open('https://docs.google.com/spreadsheets/d/1x7Me3ofa3ERcAtDJzQMD1AopkSLj2pq2SZPGqPtn-HI/edit?usp=sharing','_blank')">All Requests</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function goToPage(url){
+      window.location.href = url;
+    }
+
+    const menuShell = document.getElementById("menuShell");
+    const menuButton = document.getElementById("menuButton");
+    const menuOptions = document.querySelectorAll(".menuOption");
+
+    menuButton.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menuShell.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".menuWrap")) {
+        menuShell.classList.remove("open");
+      }
+    });
+
+    menuOptions.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const link = btn.dataset.link;
+        menuShell.classList.remove("open");
+        if (link) window.location.href = link;
+      });
+    });
+
+    const rotatingSentences = [
+      "Games, movies, tools, and a whole lot of crispy chaos.",
+      "Fresh fries served with extra fun.",
+      "Golden buttons and crispy vibes everywhere.",
+      "Pick something fun and start clicking.",
+      "Your crispy little spot for unblocked fun.",
+      "Hot fries, cool games, random stuff.",
+      "A whole carton of things to do.",
+      "Dripping with golden homepage energy.",
+      "Warm colors and fast clicks everywhere.",
+      "Find something new every time you stop by.",
+      "Crunchy design, glowy buttons, zero boredom.",
+      "One fry site, lots of chaos.",
+      "The good kind of distraction.",
+      "Tiny fries floating through cyberspace.",
+      "Made to feel fun the second it loads.",
+      "Everything looks better in Comic Sans.",
+      "Games first, homework maybe later.",
+      "Probably the crispiest site ever.",
+      "Welcome back to the fry station.",
+      "Golden nonsense, extra salt, no regrets."
+    ];
+
+    const rotatingLine = document.getElementById("rotatingLine");
+    let sentenceIndex = 0;
+
+    function changeSentence(){
+      rotatingLine.classList.add("fade");
+      setTimeout(() => {
+        sentenceIndex = (sentenceIndex + 1) % rotatingSentences.length;
+        rotatingLine.textContent = rotatingSentences[sentenceIndex];
+        rotatingLine.classList.remove("fade");
+      }, 180);
+    }
+
+    rotatingLine.textContent = rotatingSentences[0];
+    setInterval(changeSentence, 5000);
+
+    function getClockEmoji(hours, minutes){
+      const totalMinutes = (hours % 12) * 60 + minutes;
+      const halfHourIndex = Math.round(totalMinutes / 30) % 24;
+
+      const clockFaces = [
+        "🕛","🕧","🕐","🕜","🕑","🕝",
+        "🕒","🕞","🕓","🕟","🕔","🕠",
+        "🕕","🕡","🕖","🕢","🕗","🕣",
+        "🕘","🕤","🕙","🕥","🕚","🕦"
+      ];
+
+      return clockFaces[halfHourIndex];
+    }
+
+    function updateClock(){
+      const now = new Date();
+      let h = now.getHours();
+      const m = String(now.getMinutes()).padStart(2, "0");
+      const ampm = h >= 12 ? "PM" : "AM";
+
+      document.getElementById("clockEmoji").textContent = getClockEmoji(now.getHours(), now.getMinutes());
+
+      h = h % 12;
+      if(h === 0) h = 12;
+
+      document.getElementById("clock").textContent = `${h}:${m} ${ampm}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    async function updateBattery(){
+      const batteryEl = document.getElementById("battery");
+      if("getBattery" in navigator){
+        try{
+          const battery = await navigator.getBattery();
+          function renderBattery(){
+            batteryEl.textContent = `${Math.round(battery.level * 100)}%`;
+          }
+          renderBattery();
+          battery.addEventListener("levelchange", renderBattery);
+          battery.addEventListener("chargingchange", renderBattery);
+        }catch{
+          batteryEl.textContent = "--";
+        }
+      }else{
+        batteryEl.textContent = "--";
+      }
+    }
+    updateBattery();
+
+    const COUNTER_NAMESPACE = "french-fries-site";
+    const COUNTER_KEY = "homepage-visits";
+    const visitEl = document.getElementById("visitCount");
+
+    async function updateVisitCounter() {
+      try {
+        const response = await fetch(`https://api.countapi.xyz/hit/${COUNTER_NAMESPACE}/${COUNTER_KEY}`);
+        const data = await response.json();
+
+        if (typeof data.value !== "undefined" && data.value !== null) {
+          visitEl.textContent = data.value.toLocaleString();
+          localStorage.setItem("ff_fallback_visits", String(data.value));
+          return;
+        }
+
+        throw new Error("No count value");
+      } catch (err) {
+        let fallback = parseInt(localStorage.getItem("ff_fallback_visits") || "0", 10);
+        if (!fallback || Number.isNaN(fallback)) fallback = 1;
+        visitEl.textContent = fallback.toLocaleString();
+      }
+    }
+    updateVisitCounter();
+
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+
+    let w, h, fries;
+
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      createFries();
+    }
+
+    function createFries(){
+      const count = Math.max(95, Math.floor((w * h) / 9000));
+      fries = [];
+
+      for(let i = 0; i < count; i++){
+        fries.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.78,
+          vy: (Math.random() - 0.5) * 0.78,
+          length: (18 + Math.random() * 14) * 1.7,
+          width: (4 + Math.random() * 2.6) * 1.7,
+          rot: Math.random() * Math.PI * 2,
+          vr: (Math.random() - 0.5) * 0.02,
+          alpha: 0.12 + Math.random() * 0.16
+        });
+      }
+    }
+
+    function drawFry(f){
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.rotate(f.rot);
+
+      const glow = ctx.createLinearGradient(-f.length/2, 0, f.length/2, 0);
+      glow.addColorStop(0, `rgba(255,247,190,${f.alpha})`);
+      glow.addColorStop(0.5, `rgba(255,188,70,${f.alpha + 0.09})`);
+      glow.addColorStop(1, `rgba(210,92,26,${f.alpha * 0.72})`);
+
+      ctx.beginPath();
+      const radius = f.width / 2;
+      ctx.moveTo(-f.length/2 + radius, -f.width/2);
+      ctx.lineTo(f.length/2 - radius, -f.width/2);
+      ctx.quadraticCurveTo(f.length/2, -f.width/2, f.length/2, 0);
+      ctx.quadraticCurveTo(f.length/2, f.width/2, f.length/2 - radius, f.width/2);
+      ctx.lineTo(-f.length/2 + radius, f.width/2);
+      ctx.quadraticCurveTo(-f.length/2, f.width/2, -f.length/2, 0);
+      ctx.quadraticCurveTo(-f.length/2, -f.width/2, -f.length/2 + radius, -f.width/2);
+      ctx.closePath();
+      ctx.fillStyle = glow;
+      ctx.fill();
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(170,80,20,${f.alpha * 0.72})`;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function animate(){
+      ctx.clearRect(0,0,w,h);
+
+      for(const f of fries){
+        f.x += f.vx;
+        f.y += f.vy;
+        f.rot += f.vr;
+
+        if(f.x < -90) f.x = w + 90;
+        if(f.x > w + 90) f.x = -90;
+        if(f.y < -90) f.y = h + 90;
+        if(f.y > h + 90) f.y = -90;
+
+        drawFry(f);
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    animate();
+  </script>
+</body>
+</html>
