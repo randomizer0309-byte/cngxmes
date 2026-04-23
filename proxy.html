@@ -1,0 +1,94 @@
+<html><head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+		<title>Nexos | Web Proxy</title>
+		<meta name="theme-color" content="#0a0a0a">
+		<link rel="shortcut icon" content="favicon.ico">
+		<link rel="stylesheet" href="index.css">
+		
+		<script src="/baremux/index.js"></script>
+	</head>
+	<body>
+
+		<!-- Browser Chrome -->
+		<div id="nx-chrome" style="display: none;">
+			<div id="nx-tabbar">
+				<div id="nx-tabs"><div class="nx-tab active"><span class="nx-tab-title">Explore - Find your favourite videos on TikTok</span><button class="nx-tab-close">×</button></div></div>
+				<button id="nx-new-tab" title="New Tab">+</button>
+				<button id="nx-home" title="Home">⌂</button>
+			</div>
+			<div id="nx-navbar">
+				<button id="nx-back" title="Back">←</button>
+				<button id="nx-forward" title="Forward">→</button>
+				<button id="nx-refresh" title="Refresh">↻</button>
+				<input id="nx-urlbar" type="text" placeholder="Search or enter URL...">
+				<button id="nx-bookmark-toggle" title="Bookmark this page">☆</button>
+				<button id="nx-hist-btn" title="History">🕐</button>
+				<button id="nx-bk-btn" title="Bookmarks">★</button>
+				<button id="nx-add-bk" title="Add custom bookmark">+★</button>
+			</div>
+			<div id="nx-bkbar"></div>
+		</div>
+
+		<!-- Bookmarks Panel -->
+		<div id="nx-bk-panel" class="nx-panel">
+			<h3>Bookmarks</h3>
+			<div id="nx-bk-list"></div>
+		</div>
+
+		<!-- History Panel -->
+		<div id="nx-hist-panel" class="nx-panel">
+			<h3>History</h3>
+			<div id="nx-hist-list"></div>
+		</div>
+
+		<!-- Landing Page -->
+		<div id="nx-landing" style="display: flex;">
+			<div class="hero">
+				<div class="logo-icon">⚡</div>
+				<h1><span>Nexos</span> Proxy</h1>
+				<p class="tagline">Browse freely. Stay private.</p>
+			</div>
+			<div class="search-wrapper">
+				<form id="uv-form">
+					<input id="uv-search-engine" value="https://duckduckgo.com/?q=%s" type="hidden">
+					<input id="uv-address" type="text" placeholder="Search or enter URL...">
+				</form>
+			</div>
+			<div class="error-box">
+				<p id="uv-error"></p>
+				<pre id="uv-error-code"></pre>
+			</div>
+			<div class="features">
+				<div class="feature"><div class="icon">🔒</div><div class="label">Encrypted</div></div>
+				<div class="feature"><div class="icon">🚀</div><div class="label">Fast</div></div>
+				<div class="feature"><div class="icon">🌐</div><div class="label">Unblocked</div></div>
+				<div class="feature"><div class="icon">👁</div><div class="label">Private</div></div>
+			</div>
+			<footer><span>Nexos © 2026</span></footer>
+		</div>
+
+		<!-- Custom Bookmark Modal -->
+		<div id="nx-bk-modal">
+			<div class="bk-modal-card">
+				<h3 id="bkModalTitle">Add Bookmark</h3>
+				<label>Name</label>
+				<input type="text" id="bkNameInput" placeholder="e.g. Google, Dark Mode..." autocomplete="off">
+				<label>URL or JavaScript</label>
+				<textarea id="bkUrlInput" placeholder="https://example.com
+── or ──
+javascript:void(document.body.style.filter='invert(1)')"></textarea>
+				<p class="bk-hint">⚡ For bookmarklets, start with <code>javascript:</code> — runs inside the proxied page.</p>
+				<div class="bk-modal-actions">
+					<button class="bk-cancel" id="bkCancelBtn">Cancel</button>
+					<button class="bk-save" id="bkSaveBtn">Save</button>
+				</div>
+			</div>
+		</div>
+
+		<script src="register-sw.js"></script>
+		<script src="search.js"></script>
+		<script src="index.js"></script>
+	
+
+</body></html>
